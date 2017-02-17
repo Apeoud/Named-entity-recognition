@@ -84,16 +84,33 @@ def get_input(sentences):
                 else:
                     feature.append(get_vec('space'))
 
-            if sentence[i][3].endswith('O'):
-                tag = np.asarray([1, 0, 0, 0, 0])
-            elif sentence[i][3].endswith('PER'):
-                tag = np.asarray([0, 1, 0, 0, 0])
-            elif sentence[i][3].endswith('LOC'):
-                tag = np.asarray([0, 0, 1, 0, 0])
-            elif sentence[i][3].endswith('ORG'):
-                tag = np.asarray([0, 0, 0, 1, 0])
-            elif sentence[i][3].endswith('MISC'):
-                tag = np.asarray([0, 0, 0, 0, 1])
+            # if sentence[i][3].endswith('O'):
+            #     tag = np.asarray([1, 0, 0, 0, 0])
+            # elif sentence[i][3].endswith('PER'):
+            #     tag = np.asarray([0, 1, 0, 0, 0])
+            # elif sentence[i][3].endswith('LOC'):
+            #     tag = np.asarray([0, 0, 1, 0, 0])
+            # elif sentence[i][3].endswith('ORG'):
+            #     tag = np.asarray([0, 0, 0, 1, 0])
+            # elif sentence[i][3].endswith('MISC'):
+            #     tag = np.asarray([0, 0, 0, 0, 1])
+
+            if sentence[i][3] == 'O':
+                tag = np.asarray([1, 0, 0, 0, 0, 0, 0, 0])
+            elif sentence[i][3] == 'I-PER':
+                tag = np.asarray([0, 1, 0, 0, 0, 0, 0, 0])
+            elif sentence[i][3] == 'B-LOC':
+                tag = np.asarray([0, 0, 1, 0, 0, 0, 0, 0])
+            elif sentence[i][3] == 'I-LOC':
+                tag = np.asarray([0, 0, 0, 1, 0, 0, 0, 0])
+            elif sentence[i][3] == 'B-ORG':
+                tag = np.asarray([0, 0, 0, 0, 1, 0, 0, 0])
+            elif sentence[i][3] == 'I-ORG':
+                tag = np.asarray([0, 0, 0, 0, 0, 1, 0, 0])
+            elif sentence[i][3] == 'B-MISC':
+                tag = np.asarray([0, 0, 0, 0, 0, 0, 1, 0])
+            elif sentence[i][3] == 'I-MISC':
+                tag = np.asarray([0, 0, 0, 0, 0, 0, 0, 1])
 
             features.append(np.reshape(feature, (1, -1)))
             tags.append(tag)
@@ -148,13 +165,13 @@ def mlp(x, weights, biases):
 
 
 def precision_score(y_pred, y_true):
-    tp = [0] * 5
-    p = [0] * 5
+    tp = [0] * 8
+    p = [0] * 8
     for i in range(len(y_pred)):
         if y_true[i] == y_pred[i]:
             tp[y_pred[i]] += 1
         p[y_pred[i]] += 1
-    # print('token numbers: ', p)
+    print('token numbers: ', p)
     print('total precision: ', np.sum(tp[1:] / np.sum(p[1:])))
     if p[1] > 0:
         return [tp[i] / p[i] for i in range(len(tp))]
@@ -162,83 +179,25 @@ def precision_score(y_pred, y_true):
 
 
 def recall_score(y_pred, y_true):
-    tp = [0] * 5
-    t = [0] * 5
+    tp = [0] * 8
+    t = [0] * 8
     for i in range(len(y_pred)):
         if y_pred[i] == y_true[i]:
             tp[y_pred[i]] += 1
         t[y_true[i]] += 1
-    # print('token numbers: ', t)
+    print('token numbers: ', t)
     print('total recall: ', np.sum(tp[1:] / np.sum(t[1:])))
     if t[1] > 0:
         return [tp[i] / t[i] for i in range(len(tp))]
     return 0
 
 
-# weights
-weights = {
-    'h1': tf.Variable(tf.random_uniform([n_input, n_hidden_1], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40)),
-    'h2': tf.Variable(
-        tf.random_uniform([n_hidden_1, n_hidden_2], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40)),
-    'h3': tf.Variable(
-        tf.random_uniform([n_hidden_2, n_hidden_3], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40)),
-    'out': tf.Variable(tf.random_uniform([n_hidden_3, n_classes], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40))
-}
-
-biases = {
-    'h1': tf.Variable(tf.random_normal([n_hidden_1])),
-    'h2': tf.Variable(tf.random_normal([n_hidden_2])),
-    'h3': tf.Variable(tf.random_normal([n_hidden_3])),
-    'out': tf.Variable(tf.random_normal([n_classes]))
-}
-
-pred = mlp(x, weights, biases)
-
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-
-init = tf.global_variables_initializer()
-
 if __name__ == "__main__":
-
-    with tf.Session() as sess:
-        sess.run(init)
-
-        for epoch in range(training_epochs):
-
-            for block_i in range(math.ceil(SENTENCE_SIZE / BLOCK_SIZE)):
-                train_x, train_y = get_input(data_path + '/eng.train', block_i * BLOCK_SIZE,
-                                             (block_i + 1) * BLOCK_SIZE)
-                gc.collect()
-
-                avg_cost = 0
-                total_batch = math.ceil((len(train_x) / batch_size))
-
-                batch_list = [index for index in range(total_batch)]
-                random.shuffle(batch_list)
-                for batch_i in batch_list:
-                    _, c = sess.run([optimizer, cost],
-                                    feed_dict={x: train_x[batch_i * batch_size:(batch_i + 1) * batch_size],
-                                               y: train_y[batch_i * batch_size:(batch_i + 1) * batch_size]
-                                               })
-                    avg_cost += c / total_batch
-                print("Epoch:", '%04d' % (epoch + 1), "cost=", \
-                      "{:.9f}".format(avg_cost))
-
-            correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(pred, 1))
-            accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-            print(accuracy.eval({x: test_x, y: test_y}))
-
-            y_p = tf.argmax(pred, 1)
-
-            val_accuracy, y_pred = sess.run([accuracy, y_p], feed_dict={x: train_x, y: train_y})
-            y_true = np.argmax(train_y, 1)
-
-            print('train precision: ', precision_score(y_pred, y_true))
-            print('train recall: ', recall_score(y_pred, y_true))
-
-            val_accuracy, y_pred = sess.run([accuracy, y_p], feed_dict={x: test_x, y: test_y})
-            y_true = np.argmax(test_y, 1)
-
-            print('test precision: ', precision_score(y_pred, y_true))
-            print('test recall: ', recall_score(y_pred, y_true))
+    sentences = get_sentences(data_path + '/eng.train')
+    tokens = []
+    for i in range(len(sentences)):
+        tokens += (sentences[i])
+    print(len(tokens))
+    matrix = np.reshape(tokens, (-1, 4))
+    tags = matrix[:, -1]
+    print(set(tags))

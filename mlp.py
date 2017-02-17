@@ -8,7 +8,7 @@ from load import get_sentences, get_input
 from load import precision_score, recall_score
 
 # parameters
-training_epochs = 10
+training_epochs = 5
 learning_rate = 0.005
 batch_size = 100
 
@@ -17,7 +17,7 @@ n_hidden_1 = 300
 n_hidden_2 = 300
 n_hidden_3 = 300
 n_input = 2100
-n_classes = 5
+n_classes = 8
 
 train_path = './data/eng.train'
 test_path = './data/eng.testb'
