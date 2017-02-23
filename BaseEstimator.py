@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
-from conllner import Word_Window_DataSet, extract_sentences_labels, read_data_set
-from load import precision_score, get_input, get_sentences
+from conllner import Word_Window_DataSet, extract_sentences_labels, read_data_set, DataSet
+from load import precision_score, recall_score, get_input, get_sentences
 import conllner
 import math
 import random
@@ -48,21 +48,21 @@ class MultiLayerPerceptron(BaseEstimator):
             self.biases = dict()
             self.layers = dict()
 
+            self.x = tf.placeholder('float', [None, self.n_input], name='input_x')
+            self.y = tf.placeholder('float', [None, self.n_classes], name='input_y')
             self.prediction = self._construct_net()
-            y = tf.placeholder('float', [None, self.n_classes], name='input_y')
-            self.cost = tf.nn.softmax_cross_entropy_with_logits(self.prediction, y)
+
+            self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(self.prediction, self.y))
             self.optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate).minimize(self.cost)
 
-            self._saver = tf.train.Saver()
-
-
+            self.init = tf.global_variables_initializer()
 
         self.model_dir = model_dir
         self.batch_size = batch_size
 
         self._train_epochs = train_epochs
         self._stop_step = stop_step
-        self._saver = None
+        self._saver = tf.train.Saver()
         self._sess = tf.Session()
 
     def _full_connected_layer(self, in_op, input_unit, output_unit, layer_index, out_layer=False):
@@ -94,10 +94,9 @@ class MultiLayerPerceptron(BaseEstimator):
     def _construct_net(self):
 
         n_layers = len(self._hidden_units)
-        x = tf.placeholder('float', [None, self.n_input], name='input_x')
 
         # input layer
-        out_op = self._full_connected_layer(x, self.n_input, self._hidden_units[0], 0)
+        out_op = self._full_connected_layer(self.x, self.n_input, self._hidden_units[0], 0)
 
         # hidden layer
         for i in range(1, len(self._hidden_units)):
@@ -176,11 +175,10 @@ class MultiLayerPerceptron(BaseEstimator):
     def fit(self, dataset, Y, display_step=50):
 
         sentences = get_sentences('./data/eng.train')
-        x, y, pred, cost, optimizer = self._construct_graph()
 
-        self._saver = tf.train.Saver()
+        sess = tf.Session(graph=self.graph)
+        sess.run(self.init)
 
-        step = 0
         for epoch in range(self._train_epochs):
             avg_cost = 0
 
@@ -194,13 +192,13 @@ class MultiLayerPerceptron(BaseEstimator):
                 # train_x, train_y = dataset.sent2features(
                 #     dataset.tokens[batch_i * self.batch_size:(batch_i + 1) * self.batch_size],
                 #     dataset.labels[batch_i * self.batch_size:(batch_i + 1) * self.batch_size])
-                _, c = self._sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
+                _, c = sess.run([self.optimizer, self.cost], feed_dict={self.x: train_x, self.y: train_y})
                 avg_cost += c / total_batch
 
             print("Epoch:", '%04d' % (epoch + 1), "cost=", \
                   "{:.9f}".format(avg_cost))
 
-        self._saver.save(self._sess, self.model_dir)
+        self._saver.save(sess, self.model_dir)
 
         return
 
@@ -245,26 +243,39 @@ class MultiLayerPerceptron(BaseEstimator):
 
     def evaluate(self, test_x, test_y):
 
-        x, y, pred, cost, optimizer = self._construct_graph()
-        self._saver = tf.train.Saver()
-        self._saver.restore(self._sess, self.model_dir)
+        sess = tf.Session(graph=self.graph)
+        self._saver.restore(sess, self.model_dir)
 
-        with self._sess as sess:
-            y_pred = sess.run(pred, feed_dict={x: test_x, y: test_y})
-            y_pred = np.argmax(y_pred, 1)
-            y_true = np.argmax(test_y, 1)
+        y_pred = sess.run(self.prediction, feed_dict={self.x: test_x})
+        y_pred = np.argmax(y_pred, 1)
+        y_true = np.argmax(test_y, 1)
 
-            print('precision: ', precision_score(y_pred, y_true))
+        print('precision: ', precision_score(y_pred, y_true))
+        print('recall   : ', recall_score(y_pred, y_true))
 
-            # return y_pred, y_true
+        # return y_pred, y_true
 
         return
 
     def predict(self, X):
+        """ predict the unlabeled data
+        Arg:
+            X : to be predicted , (n_examples, n_features)
 
-        with tf.Session() as sess:
-            self._saver.restore(sess, self.model_dir)
-            y_pred = sess.run()
+        Return:
+            y_pred : predicted label, one hot (n_examples, n_classes)
+        """
+
+        if isinstance(X, DataSet):
+            while X.epochs_completed == 0:
+
+
+        sess = tf.Session(graph=self.graph)
+
+
+        self._saver.restore(sess, self.model_dir)
+        y_pred = sess.run(self.prediction, feed_dict={self.x : X})
+
 
         return y_pred
 
@@ -282,11 +293,11 @@ if __name__ == "__main__":
         model_dir='./tmp/models/tf_mlp.ckpt'
     )
 
-    # conll_test = conllner.read_test_data_set('w2v')
-    # test_x, test_y = conll_test.sent2features(conll_test.tokens, conll_test.labels)
+    conll_test = conllner.read_test_data_set('w2v')
+    test_x, test_y = conll_test.sent2features(conll_test.tokens, conll_test.labels)
 
     # mlp.fit(train, [], display_step=50)
 
     # test_x, test_y = get_input(get_sentences('./data/eng.testb'))
-    # mlp.evaluate(test_x, test_y)
+    mlp.evaluate(test_x, test_y)
     print('end')

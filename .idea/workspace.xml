@@ -15,8 +15,8 @@
     <SUITE FILE_PATH="coverage/ner_conll2003$mlp.coverage" NAME="mlp Coverage Results" MODIFIED="1487844384761" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ner_conll2003$conllner.coverage" NAME="conllner Coverage Results" MODIFIED="1487841044326" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ner_conll2003$cnn.coverage" NAME="cnn Coverage Results" MODIFIED="1487160076057" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/ner_conll2003$BaseEstimator.coverage" NAME="BaseEstimator Coverage Results" MODIFIED="1487850384670" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/ner_conll2003$boosting.coverage" NAME="boosting Coverage Results" MODIFIED="1487820830051" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ner_conll2003$BaseEstimator.coverage" NAME="BaseEstimator Coverage Results" MODIFIED="1487857677828" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ner_conll2003$boosting.coverage" NAME="boosting Coverage Results" MODIFIED="1487859228133" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ner_conll2003$adaboost.coverage" NAME="adaboost Coverage Results" MODIFIED="1487326651758" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ner_conll2003$crf.coverage" NAME="crf Coverage Results" MODIFIED="1487820450533" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
@@ -40,8 +40,8 @@
       <file leaf-file-name="load.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/load.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="82" column="53" lean-forward="false" selection-start-line="82" selection-start-column="53" selection-end-line="82" selection-end-column="53" />
+            <state relative-caret-position="183">
+              <caret line="81" column="0" lean-forward="false" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -61,18 +61,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BaseEstimator.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="BaseEstimator.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BaseEstimator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="338">
-              <caret line="122" column="24" lean-forward="true" selection-start-line="109" selection-start-column="4" selection-end-line="122" selection-end-column="24" />
+            <state relative-caret-position="266">
+              <caret line="270" column="0" lean-forward="false" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
-                <element signature="e#1844#2662#0" expanded="false" />
-                <element signature="e#2703#3266#0" expanded="false" />
-                <element signature="e#7252#7951#0" expanded="false" />
-                <element signature="e#8002#8458#0" expanded="false" />
-                <element signature="e#8495#8630#0" expanded="false" />
+                <element signature="e#3407#3878#0" expanded="false" />
+                <element signature="e#7303#8002#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -81,8 +78,8 @@
       <file leaf-file-name="helper.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/helper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="25" column="12" lean-forward="false" selection-start-line="25" selection-start-column="12" selection-end-line="25" selection-end-column="12" />
+            <state relative-caret-position="133">
+              <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -101,11 +98,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="conllner.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="conllner.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/conllner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="198" column="50" lean-forward="false" selection-start-line="198" selection-start-column="50" selection-end-line="198" selection-end-column="50" />
+            <state relative-caret-position="171">
+              <caret line="176" column="32" lean-forward="false" selection-start-line="176" selection-start-column="32" selection-end-line="176" selection-end-column="32" />
               <folding>
                 <element signature="e#686#1214#0" expanded="false" />
                 <element signature="e#729#1214#0" expanded="false" />
@@ -121,17 +118,17 @@
                 <element signature="e#4470#4922#0" expanded="false" />
                 <element signature="e#4745#4922#0" expanded="false" />
                 <element signature="e#4792#4922#0" expanded="false" />
-                <element signature="e#5612#5796#1" expanded="false" />
-                <element signature="e#7519#7606#0" expanded="false" />
-                <element signature="e#7666#9241#0" expanded="false" />
-                <element signature="e#7764#8168#0" expanded="false" />
-                <element signature="e#8200#8637#0" expanded="false" />
-                <element signature="e#8327#8636#0" expanded="false" />
-                <element signature="e#8730#9167#0" expanded="false" />
-                <element signature="e#8857#9166#0" expanded="false" />
-                <element signature="e#9440#9518#0" expanded="false" />
-                <element signature="e#9739#9876#0" expanded="false" />
-                <element signature="e#10100#10212#0" expanded="false" />
+                <element signature="e#5702#5886#1" expanded="false" />
+                <element signature="e#7609#7696#0" expanded="false" />
+                <element signature="e#7756#9331#0" expanded="false" />
+                <element signature="e#7854#8258#0" expanded="false" />
+                <element signature="e#8290#8727#0" expanded="false" />
+                <element signature="e#8417#8726#0" expanded="false" />
+                <element signature="e#8820#9257#0" expanded="false" />
+                <element signature="e#8947#9256#0" expanded="false" />
+                <element signature="e#9530#9608#0" expanded="false" />
+                <element signature="e#9829#9966#0" expanded="false" />
+                <element signature="e#10190#10302#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -140,9 +137,11 @@
       <file leaf-file-name="boosting.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/boosting.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="51" column="32" lean-forward="false" selection-start-line="51" selection-start-column="32" selection-end-line="51" selection-end-column="32" />
-              <folding />
+            <state relative-caret-position="304">
+              <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -206,12 +205,12 @@
         <option value="$PROJECT_DIR$/rnn.py" />
         <option value="$PROJECT_DIR$/adaboost.py" />
         <option value="$PROJECT_DIR$/crf.py" />
-        <option value="$PROJECT_DIR$/boosting.py" />
         <option value="$PROJECT_DIR$/load.py" />
-        <option value="$PROJECT_DIR$/conllner.py" />
         <option value="$PROJECT_DIR$/mlp.py" />
         <option value="$PROJECT_DIR$/helper.py" />
+        <option value="$PROJECT_DIR$/boosting.py" />
         <option value="$PROJECT_DIR$/BaseEstimator.py" />
+        <option value="$PROJECT_DIR$/conllner.py" />
       </list>
     </option>
   </component>
@@ -274,7 +273,7 @@
       <recent name="$PROJECT_DIR$/data" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.BaseEstimator">
+  <component name="RunManager" selected="Python.boosting">
     <configuration default="false" name="mlp" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -588,11 +587,11 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.BaseEstimator" />
-        <item index="1" class="java.lang.String" itemvalue="Python.helper" />
-        <item index="2" class="java.lang.String" itemvalue="Python.mlp" />
-        <item index="3" class="java.lang.String" itemvalue="Python.conllner" />
-        <item index="4" class="java.lang.String" itemvalue="Python.boosting" />
+        <item index="0" class="java.lang.String" itemvalue="Python.boosting" />
+        <item index="1" class="java.lang.String" itemvalue="Python.BaseEstimator" />
+        <item index="2" class="java.lang.String" itemvalue="Python.helper" />
+        <item index="3" class="java.lang.String" itemvalue="Python.mlp" />
+        <item index="4" class="java.lang.String" itemvalue="Python.conllner" />
       </list>
     </recent_temporary>
   </component>
@@ -622,18 +621,19 @@
     <frame x="0" y="23" width="1440" height="803" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21745351" sideWeight="0.4871795" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32630098" sideWeight="0.4828326" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2658228" sideWeight="0.64520746" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3445851" sideWeight="0.6380544" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30415264" sideWeight="0.471246" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2658228" sideWeight="0.35479257" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2658228" sideWeight="0.3505007" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297568" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32884398" sideWeight="0.49307775" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21745351" sideWeight="0.4871795" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15654951" sideWeight="0.51282054" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3445851" sideWeight="0.3683834" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3445851" sideWeight="0.36194563" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -654,18 +654,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/conllner.py</url>
-          <line>323</line>
+          <line>329</line>
           <option name="timeStamp" value="80" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/load.py</url>
-          <line>81</line>
-          <option name="timeStamp" value="81" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/conllner.py</url>
-          <line>189</line>
-          <option name="timeStamp" value="82" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -678,7 +668,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="88" />
+      <option name="time" value="92" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1039,14 +1029,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/boosting.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="51" column="32" lean-forward="false" selection-start-line="51" selection-start-column="32" selection-end-line="51" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/eng.testb">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6512">
@@ -1055,36 +1037,32 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/conllner.py">
+    <entry file="file://$PROJECT_DIR$/mlp.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="198" column="50" lean-forward="false" selection-start-line="198" selection-start-column="50" selection-end-line="198" selection-end-column="50" />
+          <caret line="71" column="71" lean-forward="false" selection-start-line="71" selection-start-column="71" selection-end-line="71" selection-end-column="71" />
           <folding>
-            <element signature="e#686#1214#0" expanded="false" />
-            <element signature="e#729#1214#0" expanded="false" />
-            <element signature="e#802#953#0" expanded="false" />
-            <element signature="e#988#1214#0" expanded="false" />
-            <element signature="e#1020#1091#0" expanded="false" />
-            <element signature="e#1134#1208#0" expanded="false" />
-            <element signature="e#1214#1270#0" expanded="false" />
-            <element signature="e#1408#1709#0" expanded="false" />
-            <element signature="e#1849#2132#0" expanded="false" />
-            <element signature="e#2188#2217#0" expanded="false" />
-            <element signature="e#2263#2282#0" expanded="false" />
-            <element signature="e#4470#4922#0" expanded="false" />
-            <element signature="e#4745#4922#0" expanded="false" />
-            <element signature="e#4792#4922#0" expanded="false" />
-            <element signature="e#5612#5796#1" expanded="false" />
-            <element signature="e#7519#7606#0" expanded="false" />
-            <element signature="e#7666#9241#0" expanded="false" />
-            <element signature="e#7764#8168#0" expanded="false" />
-            <element signature="e#8200#8637#0" expanded="false" />
-            <element signature="e#8327#8636#0" expanded="false" />
-            <element signature="e#8730#9167#0" expanded="false" />
-            <element signature="e#8857#9166#0" expanded="false" />
-            <element signature="e#9440#9518#0" expanded="false" />
-            <element signature="e#9739#9876#0" expanded="false" />
-            <element signature="e#10100#10212#0" expanded="false" />
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/load.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="81" column="0" lean-forward="false" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/boosting.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1100,45 +1078,56 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/load.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="82" column="53" lean-forward="false" selection-start-line="82" selection-start-column="53" selection-end-line="82" selection-end-column="53" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mlp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="71" column="71" lean-forward="false" selection-start-line="71" selection-start-column="71" selection-end-line="71" selection-end-column="71" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="25" column="12" lean-forward="false" selection-start-line="25" selection-start-column="12" selection-end-line="25" selection-end-column="12" />
+        <state relative-caret-position="133">
+          <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/BaseEstimator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="122" column="24" lean-forward="true" selection-start-line="109" selection-start-column="4" selection-end-line="122" selection-end-column="24" />
+        <state relative-caret-position="266">
+          <caret line="270" column="0" lean-forward="false" selection-start-line="270" selection-start-column="0" selection-end-line="270" selection-end-column="0" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <element signature="e#1844#2662#0" expanded="false" />
-            <element signature="e#2703#3266#0" expanded="false" />
-            <element signature="e#7252#7951#0" expanded="false" />
-            <element signature="e#8002#8458#0" expanded="false" />
-            <element signature="e#8495#8630#0" expanded="false" />
+            <element signature="e#3407#3878#0" expanded="false" />
+            <element signature="e#7303#8002#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conllner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="176" column="32" lean-forward="false" selection-start-line="176" selection-start-column="32" selection-end-line="176" selection-end-column="32" />
+          <folding>
+            <element signature="e#686#1214#0" expanded="false" />
+            <element signature="e#729#1214#0" expanded="false" />
+            <element signature="e#802#953#0" expanded="false" />
+            <element signature="e#988#1214#0" expanded="false" />
+            <element signature="e#1020#1091#0" expanded="false" />
+            <element signature="e#1134#1208#0" expanded="false" />
+            <element signature="e#1214#1270#0" expanded="false" />
+            <element signature="e#1408#1709#0" expanded="false" />
+            <element signature="e#1849#2132#0" expanded="false" />
+            <element signature="e#2188#2217#0" expanded="false" />
+            <element signature="e#2263#2282#0" expanded="false" />
+            <element signature="e#4470#4922#0" expanded="false" />
+            <element signature="e#4745#4922#0" expanded="false" />
+            <element signature="e#4792#4922#0" expanded="false" />
+            <element signature="e#5702#5886#1" expanded="false" />
+            <element signature="e#7609#7696#0" expanded="false" />
+            <element signature="e#7756#9331#0" expanded="false" />
+            <element signature="e#7854#8258#0" expanded="false" />
+            <element signature="e#8290#8727#0" expanded="false" />
+            <element signature="e#8417#8726#0" expanded="false" />
+            <element signature="e#8820#9257#0" expanded="false" />
+            <element signature="e#8947#9256#0" expanded="false" />
+            <element signature="e#9530#9608#0" expanded="false" />
+            <element signature="e#9829#9966#0" expanded="false" />
+            <element signature="e#10190#10302#0" expanded="false" />
           </folding>
         </state>
       </provider>

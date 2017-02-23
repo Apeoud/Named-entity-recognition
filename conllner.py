@@ -170,6 +170,12 @@ class Word_Window_DataSet(DataSet):
             return np.asarray(vec)
         return rand
 
+
+    def _extract_feature(self, raw):
+        return
+
+    def _extract_label(self, raw):
+
     def sent2features(self, batch_x, batch_y):
         """ according different models using different features selection methods
             in word window method
