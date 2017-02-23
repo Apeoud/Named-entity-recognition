@@ -80,7 +80,7 @@ def get_input(sentences):
 
             for j in [i - 3, i - 2, i - 1, i, i + 1, i + 2, i + 3]:
                 if j in range(len(sentence)):
-                    feature.append(get_vec(sentence[i][0]))
+                    feature.append(get_vec(sentence[j][0]))
                 else:
                     feature.append(get_vec('space'))
 

@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from conllner import Word_Window_DataSet, extract_sentences_labels, read_data_set
+from load import precision_score, get_input, get_sentences
 import conllner
 import math
 import random
@@ -33,54 +34,93 @@ class MultiLayerPerceptron(BaseEstimator):
                  train_epochs=1000,
                  learning_rate=0.01,
                  batch_size=200):
+
+        """" initialize the DNN network """
         self._hidden_units = hidden_units
         self.n_input = n_input
         self.n_classes = n_classes
+        self._learning_rate = learning_rate
+
+        self.graph = tf.get_default_graph()
+
+        with self.graph.as_default():
+            self.weights = dict()
+            self.biases = dict()
+            self.layers = dict()
+
+            self.prediction = self._construct_net()
+            y = tf.placeholder('float', [None, self.n_classes], name='input_y')
+            self.cost = tf.nn.softmax_cross_entropy_with_logits(self.prediction, y)
+            self.optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate).minimize(self.cost)
+
+            self._saver = tf.train.Saver()
+
+
+
         self.model_dir = model_dir
         self.batch_size = batch_size
-        self._learning_rate = learning_rate
+
         self._train_epochs = train_epochs
         self._stop_step = stop_step
         self._saver = None
         self._sess = tf.Session()
 
-    def precision_score(self, y_pred, y_true):
-        """
+    def _full_connected_layer(self, in_op, input_unit, output_unit, layer_index, out_layer=False):
 
-        :param pred:
-        :param y:
-        :return:
-        """
-        y_true = np.argmax(y_true, 1)
-        y_pred = np.argmax(y_pred, 1)
+        if layer_index >= len(self._hidden_units):
+            raise ValueError()
 
-        tp = [0] * 5
-        p = [0] * 5
-        for i in range(len(y_pred)):
-            if y_true[i] == y_pred[i]:
-                tp[y_pred[i]] += 1
-            p[y_pred[i]] += 1
+        if out_layer:
+            layer_name = 'out'
+        else:
+            layer_name = 'hidden_' + str(layer_index)
 
-        return np.sum(tp[1:] / np.sum(p[1:]))
+        weight = tf.Variable(
+            tf.random_uniform([input_unit, output_unit], minval=- math.sqrt(6) / math.sqrt(input_unit + output_unit),
+                              maxval=math.sqrt(6) / math.sqrt(input_unit + output_unit)),
+            name='w_' + layer_name)
+        bias = tf.Variable(tf.random_normal([output_unit]), name='b_' + layer_name)
 
-        #
-        #
-        # perm = [i for i in range(len(y_true)) if y_true[i] != 0]
-        # real_pred = y_pred[perm]
-        # real_true = y_true[perm]
-        #
-        # acc = np.mean(np.equal(real_pred, real_true))
-        #
-        # return acc
+        layer = tf.add(tf.matmul(in_op, weight), bias)
+        if not out_layer:
+            layer = tf.nn.relu(layer)
 
-    def construct_variables(self):
-        """ construct tf variables
-        """
-        if self._hidden_units == []:
-            raise ValueError("invalid unit parameters")
+        self.weights[layer_name] = weight
+        self.biases[layer_name] = bias
+        self.layers[layer_name] = layer
+
+        return layer
+
+    def _construct_net(self):
+
         n_layers = len(self._hidden_units)
+        x = tf.placeholder('float', [None, self.n_input], name='input_x')
 
-        return
+        # input layer
+        out_op = self._full_connected_layer(x, self.n_input, self._hidden_units[0], 0)
+
+        # hidden layer
+        for i in range(1, len(self._hidden_units)):
+            out_op = self._full_connected_layer(out_op, self._hidden_units[i - 1], self._hidden_units[i], i)
+
+        # out layer
+        out_layer = self._full_connected_layer(out_op, self._hidden_units[-1], self.n_classes, i, out_layer=True)
+        return out_layer
+
+    def mlp_ff(self, x, weights, biases):
+        layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['h1'])
+        layer_1 = tf.nn.relu(layer_1)
+
+        layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['h2'])
+        layer_2 = tf.nn.relu(layer_2)
+
+        layer_3 = tf.add(tf.matmul(layer_2, weights['h3']), biases['h3'])
+        layer_3 = tf.nn.sigmoid(layer_3)
+
+        out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+
+        # out_layer = tf.nn.softmax(out_layer)
+        return out_layer
 
     def _construct_graph(self):
         """ construct the graph mainly variables
@@ -91,62 +131,52 @@ class MultiLayerPerceptron(BaseEstimator):
         x = tf.placeholder('float', [None, self.n_input])
         y = tf.placeholder('float', [None, self.n_classes])
 
-        weights = []
-        biases = []
+        # weights
+        weights = {
+            'h1': tf.Variable(
+                tf.random_uniform([self.n_input, 300], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+                name='w_h1'),
+            'h2': tf.Variable(
+                tf.random_uniform([300, 300], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+                name='w_h2'),
+            'h3': tf.Variable(
+                tf.random_uniform([300, 300], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+                name='w_h3'),
+            'out': tf.Variable(
+                tf.random_uniform([300, 5], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+                name='w_out')
+        }
 
-        # weights and biases
-        weights = dict()
-        biases = dict()
-        weights['h1'] = tf.Variable(
-            tf.random_uniform([self.n_input, self._hidden_units[0]], minval=- math.sqrt(6) / 40,
-                              maxval=math.sqrt(6) / 40),
-            name='w_h1')
-        biases['h1'] = tf.Variable(tf.random_normal([self._hidden_units[0]]), name='b_h1')
-        weights['out'] = tf.Variable(
-            tf.random_uniform([self._hidden_units[-1], self.n_classes], minval=- math.sqrt(6) / 40,
-                              maxval=math.sqrt(6) / 40),
-            name='w_out'
-        )
-        biases['out'] = tf.Variable(tf.random_normal([self.n_classes]), name='b_out')
-        for i in range(len(self._hidden_units) - 1):
-            weights['h' + str(i + 2)] = tf.Variable(
-                tf.random_uniform([self._hidden_units[i], self._hidden_units[i + 1]], minval=- math.sqrt(6) / 40,
-                                  maxval=math.sqrt(6) / 40),
-                name='w_h' + str(i + 2)
-            )
-            biases['h' + str(i + 2)] = tf.Variable(tf.random_normal([self._hidden_units[i + 1]]),
-                                                   name='b_h' + str(i + 2))
+        biases = {
+            'h1': tf.Variable(tf.random_normal([300]), name='b_h1'),
+            'h2': tf.Variable(tf.random_normal([300]), name='b_h2'),
+            'h3': tf.Variable(tf.random_normal([300]), name='b_h3'),
+            'out': tf.Variable(tf.random_normal([self.n_classes]), name='b_out')
+        }
 
-        # weights and biases
+        # tf.add_to_collection('vars', weights)
+        # tf.add_to_collection('vars', biases)
+        #
+        # saver = tf.train.Saver()
 
-        def mlp_ff(x, weights, biases):
-            layer_in = tf.add(tf.matmul(x, weights['h1']), biases['h1'])
-            layer_out = tf.nn.relu(layer_in)
-            for i in range(len(self._hidden_units) - 1):
-                layer_out = tf.add(tf.matmul(layer_in, weights['h' + str(i + 2)]), biases['h' + str(i + 2)])
-                layer_out = tf.nn.relu(layer_out)
-                layer_in = layer_out
-
-            out_layer = tf.matmul(layer_out, weights['out']) + biases['out']
-            # out_layer = tf.nn.softmax(out_layer)
-            return out_layer
-
-        pred = mlp_ff(x, weights, biases)
+        pred = self.mlp_ff(x, weights, biases)
         cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
         optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate).minimize(cost)
+
+        # prediction
+        y_p = tf.argmax(pred, 1)
+
+        init = tf.global_variables_initializer()
 
         init = tf.global_variables_initializer()
         self._sess.run(init)
 
         return x, y, pred, cost, optimizer
 
-    def fit(self, dataset, test_set, display_step=50):
+    def fit(self, dataset, Y, display_step=50):
 
+        sentences = get_sentences('./data/eng.train')
         x, y, pred, cost, optimizer = self._construct_graph()
-
-        # define evaluate
-        correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
-        accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
         self._saver = tf.train.Saver()
 
@@ -160,28 +190,15 @@ class MultiLayerPerceptron(BaseEstimator):
             random.shuffle(batch_list)
 
             for batch_i in batch_list:
-                train_x, train_y = dataset.sent2features(
-                    dataset.tokens[batch_i * self.batch_size:(batch_i + 1) * self.batch_size],
-                    dataset.labels[batch_i * self.batch_size:(batch_i + 1) * self.batch_size])
+                train_x, train_y = get_input(sentences[batch_i * self.batch_size:(batch_i + 1) * self.batch_size])
+                # train_x, train_y = dataset.sent2features(
+                #     dataset.tokens[batch_i * self.batch_size:(batch_i + 1) * self.batch_size],
+                #     dataset.labels[batch_i * self.batch_size:(batch_i + 1) * self.batch_size])
                 _, c = self._sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
                 avg_cost += c / total_batch
 
             print("Epoch:", '%04d' % (epoch + 1), "cost=", \
                   "{:.9f}".format(avg_cost))
-
-            # opt, c = sess.run([optimizer, cost], feed_dict={x: batch_x, y: batch_y})
-            # if dataset.epochs_completed - start_epoch == 1:
-            #     y_pred = sess.run(pred, feed_dict={x: batch_x, y: batch_y})
-            #     acc = self.precision_score(y_pred, batch_y)
-            #     print("Iter " + str(step) + ", Mini-batch accuracy = " + \
-            #           "{:.6f}".format(acc) + ", loss = " + "{:.5f}".format(c))
-            #
-            #     test_x, test_y = test_set.sent2features(test_set.tokens, test_set.labels)
-            #
-            #     y_pred = sess.run(pred, feed_dict={x: test_x, y: test_y})
-            #     # y_true = np.argmax(test_y, 1)
-            #
-            #     print('precision: ', self.precision_score(y_pred, test_y))
 
         self._saver.save(self._sess, self.model_dir)
 
@@ -199,7 +216,34 @@ class MultiLayerPerceptron(BaseEstimator):
         self._saver.restore(self._sess, self._hidden_units)
         return
 
-    def evaluate(self, X, y):
+    def precision_score(self, y_pred, y_true):
+        """
+        Arg:
+            y_pred : prediction of of the test data, one-hot format
+            y_true : label of the test data , one-hot format
+
+        """
+        y_true = np.argmax(y_true, 1)
+        y_pred = np.argmax(y_pred, 1)
+
+        tp = [0] * 5
+        p = [0] * 5
+        for i in range(len(y_pred)):
+            if y_true[i] == y_pred[i]:
+                tp[y_pred[i]] += 1
+            p[y_pred[i]] += 1
+
+        return np.sum(tp[1:] / np.sum(p[1:]))
+
+        # perm = [i for i in range(len(y_true)) if y_true[i] != 0]
+        # real_pred = y_pred[perm]
+        # real_true = y_true[perm]
+        #
+        # acc = np.mean(np.equal(real_pred, real_true))
+        #
+        # return acc
+
+    def evaluate(self, test_x, test_y):
 
         x, y, pred, cost, optimizer = self._construct_graph()
         self._saver = tf.train.Saver()
@@ -207,16 +251,17 @@ class MultiLayerPerceptron(BaseEstimator):
 
         with self._sess as sess:
             y_pred = sess.run(pred, feed_dict={x: test_x, y: test_y})
-            # y_pred = np.argmax(y_pred, 1)
-            # y_true = np.argmax(test_y, 1)
+            y_pred = np.argmax(y_pred, 1)
+            y_true = np.argmax(test_y, 1)
 
-            print('precision: ', self.precision_score(y_pred, test_y))
+            print('precision: ', precision_score(y_pred, y_true))
 
             # return y_pred, y_true
 
         return
 
     def predict(self, X):
+
         with tf.Session() as sess:
             self._saver.restore(sess, self.model_dir)
             y_pred = sess.run()
@@ -224,10 +269,7 @@ class MultiLayerPerceptron(BaseEstimator):
         return y_pred
 
 
-
-
 if __name__ == "__main__":
-
     train = read_data_set('w2v')
 
     mlp = MultiLayerPerceptron(
@@ -237,11 +279,14 @@ if __name__ == "__main__":
         n_classes=5,
         batch_size=100,
         learning_rate=0.005,
-        model_dir='./tmp/models/mlp.ckpt'
+        model_dir='./tmp/models/tf_mlp.ckpt'
     )
 
-    conll_test = conllner.read_test_data_set('w2v')
-    test_x, test_y = conll_test.sent2features(conll_test.tokens, conll_test.labels)
+    # conll_test = conllner.read_test_data_set('w2v')
+    # test_x, test_y = conll_test.sent2features(conll_test.tokens, conll_test.labels)
 
-    mlp.fit(train, conll_test, display_step=50)
-    mlp.evaluate(test_x, test_y)
+    # mlp.fit(train, [], display_step=50)
+
+    # test_x, test_y = get_input(get_sentences('./data/eng.testb'))
+    # mlp.evaluate(test_x, test_y)
+    print('end')

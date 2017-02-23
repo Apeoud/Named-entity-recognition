@@ -8,6 +8,7 @@ from load import get_sentences, get_input
 from load import precision_score, recall_score
 import tflearn
 from conllner import read_data_set
+import conllner
 
 # parameters
 training_epochs = 5
@@ -22,7 +23,7 @@ n_input = 2100
 n_classes = 5
 
 train_path = './data/eng.train'
-test_path = './data/eng.testb'
+test_path = './data/eng.testa'
 
 
 def mlp_ff(x, weights, biases):
@@ -122,55 +123,24 @@ def train(training_epoch=5, flag=2):
             sess.run(init)
 
             print(save_path)
-            saver.restore(sess, './tmp/models/mlp.ckpt')
+            saver.restore(sess, './tmp/models/tf_mlp.ckpt')
             print("Model restored from file: %s" % save_path)
 
-            test_x, test_y = get_input(get_sentences(test_path))
+            # test_x, test_y = get_input(get_sentences(test_path))
+            conll_test = conllner.read_test_data_set('w2v')
+            test_x, test_y = conll_test.sent2features(conll_test.tokens, conll_test.labels)
+
             y_pred = sess.run(pred, feed_dict={x: test_x, y: test_y})
             y_pred = np.argmax(y_pred, 1)
             y_true = np.argmax(test_y, 1)
 
             print('precision: ', precision_score(y_pred, y_true))
+            print('recall   : ', recall_score(y_pred, y_true))
 
             return y_pred, y_true
 
 
-def train_tflearn():
-    input_layer = tflearn.input_data(shape=[None, 2100])
-    dense1 = tflearn.fully_connected(input_layer, 300, activation='relu',
-                                     regularizer='L2', weight_decay=0.001)
-    dropout1 = tflearn.dropout(dense1, 0.8)
-    dense2 = tflearn.fully_connected(dropout1, 300, activation='relu',
-                                     regularizer='L2', weight_decay=0.001)
-    dropout2 = tflearn.dropout(dense2, 0.8)
-    softmax = tflearn.fully_connected(dropout2, 5, activation='softmax')
-
-    # Regression using SGD with learning rate decay and Top-3 accuracy
-    sgd = tflearn.SGD(learning_rate=0.01, lr_decay=0.96, decay_step=1000)
-    top_k = tflearn.metrics.Top_k(3)
-    net = tflearn.regression(softmax, optimizer=sgd, metric=top_k,
-                             loss='categorical_crossentropy')
-
-    # Training
-    model = tflearn.DNN(net, tensorboard_verbose=0)
-    model.fit(X, Y, n_epoch=20, validation_set=(testX, testY),
-              show_metric=True, run_id="dense_model")
-
-
 if __name__ == '__main__':
-    train = read_data_set('w2v')
+    # train(flag=2)
+    train(flag=1)
 
-    t_x, t_y = train.sent2features(train.tokens[:100], train.labels[:100])
-    t_x.reshape((-1, len(t_x)))
-
-    sentences = get_sentences(train_path)
-    t1_x, t2_y = get_input(sentences[:100])
-    t1_x.reshape((-1, len(t1_x)))
-
-    print(t1_x.shape)
-    print(t_x.shape)
-
-    print(np.mean(np.equal(t_x, t1_x)))
-    # y_p, y_t = train(flag=2)
-    # print(y_p.shape)
-    # predict()

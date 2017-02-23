@@ -185,9 +185,9 @@ class Word_Window_DataSet(DataSet):
             for i in range(len(sentence)):
                 feature = []
 
-                for j in [i - k + (self._windows_size - 1) / 2 for k in range(self._windows_size)]:
+                for j in [i + k - (self._windows_size - 1) / 2 for k in range(self._windows_size)]:
                     if j in range(len(sentence)):
-                        feature.append(self.word2vec(sentence[i][0]))
+                        feature.append(self.word2vec(sentence[int(j)]))
                     else:
                         feature.append(self.word2vec('space'))
 
@@ -321,4 +321,5 @@ if __name__ == "__main__":
     conll = read_data_set('w2v')
     while True:
         batch_x, batch_y = conll.next_batch(500)
+        conll.sent2features(batch_x, batch_y)
         print(batch_x.shape, batch_y.shape)
