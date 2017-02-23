@@ -6,6 +6,8 @@ import random
 import tensorflow as tf
 from load import get_sentences, get_input
 from load import precision_score, recall_score
+import tflearn
+from conllner import read_data_set
 
 # parameters
 training_epochs = 5
@@ -17,7 +19,7 @@ n_hidden_1 = 300
 n_hidden_2 = 300
 n_hidden_3 = 300
 n_input = 2100
-n_classes = 8
+n_classes = 5
 
 train_path = './data/eng.train'
 test_path = './data/eng.testb'
@@ -38,31 +40,43 @@ def mlp_ff(x, weights, biases):
     return out_layer
 
 
-def train(training_epoch=10):
+def train(training_epoch=5, flag=2):
+    # save the model
+
+
+    # placeholder
     x = tf.placeholder('float', [None, n_input])
     y = tf.placeholder('float', [None, n_classes])
 
     # weights
     weights = {
         'h1': tf.Variable(
-            tf.random_uniform([n_input, n_hidden_1], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40)),
+            tf.random_uniform([n_input, n_hidden_1], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+            name='w_h1'),
         'h2': tf.Variable(
-            tf.random_uniform([n_hidden_1, n_hidden_2], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40)),
+            tf.random_uniform([n_hidden_1, n_hidden_2], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+            name='w_h2'),
         'h3': tf.Variable(
-            tf.random_uniform([n_hidden_2, n_hidden_3], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40)),
+            tf.random_uniform([n_hidden_2, n_hidden_3], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+            name='w_h3'),
         'out': tf.Variable(
-            tf.random_uniform([n_hidden_3, n_classes], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40))
+            tf.random_uniform([n_hidden_3, n_classes], minval=- math.sqrt(6) / 40, maxval=math.sqrt(6) / 40),
+            name='w_out')
     }
 
     biases = {
-        'h1': tf.Variable(tf.random_normal([n_hidden_1])),
-        'h2': tf.Variable(tf.random_normal([n_hidden_2])),
-        'h3': tf.Variable(tf.random_normal([n_hidden_3])),
-        'out': tf.Variable(tf.random_normal([n_classes]))
+        'h1': tf.Variable(tf.random_normal([n_hidden_1]), name='b_h1'),
+        'h2': tf.Variable(tf.random_normal([n_hidden_2]), name='b_h2'),
+        'h3': tf.Variable(tf.random_normal([n_hidden_3]), name='b_h3'),
+        'out': tf.Variable(tf.random_normal([n_classes]), name='b_out')
     }
 
-    pred = mlp_ff(x, weights, biases)
+    # tf.add_to_collection('vars', weights)
+    # tf.add_to_collection('vars', biases)
+    #
+    # saver = tf.train.Saver()
 
+    pred = mlp_ff(x, weights, biases)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
@@ -74,38 +88,89 @@ def train(training_epoch=10):
     # all sentences
     sentences = get_sentences(train_path)
 
+    save_path = ''
+    saver = tf.train.Saver()
 
-    with tf.Session() as sess:
-        sess.run(init)
+    if flag == 2:
 
-        for epoch in range(training_epoch):
-            avg_cost = 0
-            # each batch contains batch_size sentences
-            total_batch = math.ceil((len(sentences) / batch_size))
+        with tf.Session() as sess:
 
-            batch_list = [index for index in range(total_batch)]
-            random.shuffle(batch_list)
+            sess.run(init)
 
-            for batch_i in batch_list:
-                train_x, train_y = get_input(sentences[batch_i * batch_size:(batch_i + 1) * batch_size])
-                _, c = sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
-                avg_cost += c / total_batch
+            for epoch in range(training_epoch):
+                avg_cost = 0
+                # each batch contains batch_size sentences
+                total_batch = math.ceil((len(sentences) / batch_size))
 
-            print("Epoch:", '%04d' % (epoch + 1), "cost=", \
-                  "{:.9f}".format(avg_cost))
+                batch_list = [index for index in range(total_batch)]
+                # random.shuffle(batch_list)
 
-        test_x, test_y = get_input(get_sentences(test_path))
-        y_pred = sess.run(y_p, feed_dict={x: test_x, y: test_y})
-        y_true = np.argmax(test_y, 1)
+                for batch_i in batch_list:
+                    train_x, train_y = get_input(sentences[batch_i * batch_size:(batch_i + 1) * batch_size])
+                    _, c = sess.run([optimizer, cost], feed_dict={x: train_x, y: train_y})
+                    avg_cost += c / total_batch
 
-        print('precision: ', precision_score(y_pred, y_true))
+                print("Epoch:", '%04d' % (epoch + 1), "cost=", \
+                      "{:.9f}".format(avg_cost))
+
+            save_path = saver.save(sess, './tmp/models/tf_mlp.ckpt')
+            print(save_path)
+
+    else:
+
+        with tf.Session() as sess:
+            sess.run(init)
+
+            print(save_path)
+            saver.restore(sess, './tmp/models/mlp.ckpt')
+            print("Model restored from file: %s" % save_path)
+
+            test_x, test_y = get_input(get_sentences(test_path))
+            y_pred = sess.run(pred, feed_dict={x: test_x, y: test_y})
+            y_pred = np.argmax(y_pred, 1)
+            y_true = np.argmax(test_y, 1)
+
+            print('precision: ', precision_score(y_pred, y_true))
+
+            return y_pred, y_true
 
 
+def train_tflearn():
+    input_layer = tflearn.input_data(shape=[None, 2100])
+    dense1 = tflearn.fully_connected(input_layer, 300, activation='relu',
+                                     regularizer='L2', weight_decay=0.001)
+    dropout1 = tflearn.dropout(dense1, 0.8)
+    dense2 = tflearn.fully_connected(dropout1, 300, activation='relu',
+                                     regularizer='L2', weight_decay=0.001)
+    dropout2 = tflearn.dropout(dense2, 0.8)
+    softmax = tflearn.fully_connected(dropout2, 5, activation='softmax')
 
-def main():
-    with tf.Session() as sess:
-        sess.run()
+    # Regression using SGD with learning rate decay and Top-3 accuracy
+    sgd = tflearn.SGD(learning_rate=0.01, lr_decay=0.96, decay_step=1000)
+    top_k = tflearn.metrics.Top_k(3)
+    net = tflearn.regression(softmax, optimizer=sgd, metric=top_k,
+                             loss='categorical_crossentropy')
+
+    # Training
+    model = tflearn.DNN(net, tensorboard_verbose=0)
+    model.fit(X, Y, n_epoch=20, validation_set=(testX, testY),
+              show_metric=True, run_id="dense_model")
 
 
 if __name__ == '__main__':
-    train()
+    train = read_data_set('w2v')
+
+    t_x, t_y = train.sent2features(train.tokens[:100], train.labels[:100])
+    t_x.reshape((-1, len(t_x)))
+
+    sentences = get_sentences(train_path)
+    t1_x, t2_y = get_input(sentences[:100])
+    t1_x.reshape((-1, len(t1_x)))
+
+    print(t1_x.shape)
+    print(t_x.shape)
+
+    print(np.mean(np.equal(t_x, t1_x)))
+    # y_p, y_t = train(flag=2)
+    # print(y_p.shape)
+    # predict()

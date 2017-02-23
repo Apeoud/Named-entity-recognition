@@ -13,3 +13,9 @@ n_input = 300
 n_step = 5
 n_hidden = 300
 n_classes = 5
+
+def rnn(x, weights, biases):
+    
+
+
+    return

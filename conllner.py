@@ -1,7 +1,8 @@
 import numpy as np
 import re
 
-def extract_sentences_labels(path):
+
+def extract_sentences_labels(path, feature=False):
     """extract sentences into a list of sentence
 
     Args:
@@ -32,8 +33,12 @@ def extract_sentences_labels(path):
                 sentences_labels.append(sentence_labels)
                 sentence_labels = []
             else:
-                sentence.append(arr[0])
-                sentence_labels.append(arr[3])
+                if feature:
+                    sentence.append(arr)
+                    sentence_labels.append(arr[3])
+                else:
+                    sentence.append(arr[0])
+                    sentence_labels.append(arr[3])
 
     # return list of sentences [sent0, sent1, ... , sent100]
     # sent0 = ['today', 'i', 'want', ...]
@@ -63,6 +68,22 @@ class DataSet(object):
         self._epochs_completed = 0
         self._index_in_epoch = 0
 
+    @property
+    def epochs_completed(self):
+        return self._epochs_completed
+
+    @property
+    def tokens(self):
+        return self._tokens
+
+    @property
+    def labels(self):
+        return self._labels
+
+    @property
+    def num_examples(self):
+        return self._num_examples
+
     def next_batch(self, batch_size, shuffle=True):
         start = self._index_in_epoch
 
@@ -71,11 +92,12 @@ class DataSet(object):
             # permute the data
             perm0 = np.arange(self._num_examples)
             np.random.shuffle(perm0)
-            self._tokens = [self._tokens[i] for i in range(len(perm0))]
-            self._labels = [self._labels[i] for i in range(len(perm0))]
+            self._tokens = [self._tokens[perm0[i]] for i in range(len(perm0))]
+            self._labels = [self._labels[perm0[i]] for i in range(len(perm0))]
 
         # go to the next batch
         if start + batch_size > self._num_examples:
+            self._epochs_completed += 1
             rest_num_examples = self._num_examples - start
 
             token_rest_part = self._tokens[start:self._num_examples]
@@ -84,8 +106,8 @@ class DataSet(object):
             if shuffle:
                 perm = np.arange(self._num_examples)
                 np.random.shuffle(perm)
-                self._tokens = [self._tokens[i] for i in range(len(perm))]
-                self._labels = [self._labels[i] for i in range(len(perm))]
+                self._tokens = [self._tokens[perm[i]] for i in range(len(perm))]
+                self._labels = [self._labels[perm[i]] for i in range(len(perm))]
 
             start = 0
 
@@ -94,11 +116,13 @@ class DataSet(object):
             token_new_part = self._tokens[start:end]
             label_new_part = self._labels[start:end]
 
+            # print("satrt, end : ", start, end)
             return np.concatenate((token_rest_part, token_new_part)), np.concatenate((label_rest_part, label_new_part))
         else:
             # return the next batch
             self._index_in_epoch += batch_size
             end = self._index_in_epoch
+            # print("satrt, end : ", start, end)
             return self._tokens[start:end], self._labels[start:end]
 
     def sent2features(self, batch_x, batch_y):
@@ -111,8 +135,8 @@ class Word_Window_DataSet(DataSet):
                  tokens,
                  labels,
                  dictionary_path,
-                 window_size = 5,
-                 vector_size = 300,
+                 window_size=5,
+                 vector_size=300,
                  one_hot=False):
         super().__init__(tokens, labels, one_hot)
 
@@ -126,7 +150,6 @@ class Word_Window_DataSet(DataSet):
                 word = arr[0]
                 vec = arr[1:]
                 self.dictionary[word] = vec
-
 
     def word2vec(self, word):
         rand = np.random.uniform(-0.25, 0.25, self._vector_size)
@@ -147,7 +170,6 @@ class Word_Window_DataSet(DataSet):
             return np.asarray(vec)
         return rand
 
-
     def sent2features(self, batch_x, batch_y):
         """ according different models using different features selection methods
             in word window method
@@ -163,47 +185,140 @@ class Word_Window_DataSet(DataSet):
             for i in range(len(sentence)):
                 feature = []
 
-                for j in [i - k + (self._windows_size - 1) /2 for k in range(self._windows_size)]:
+                for j in [i - k + (self._windows_size - 1) / 2 for k in range(self._windows_size)]:
                     if j in range(len(sentence)):
                         feature.append(self.word2vec(sentence[i][0]))
                     else:
                         feature.append(self.word2vec('space'))
 
-                if label[i].endswith('O'):
-                    tag = np.asarray([1, 0, 0, 0, 0])
-                elif label[i].endswith('PER'):
-                    tag = np.asarray([0, 1, 0, 0, 0])
-                elif label[i].endswith('LOC'):
-                    tag = np.asarray([0, 0, 1, 0, 0])
-                elif label[i].endswith('ORG'):
-                    tag = np.asarray([0, 0, 0, 1, 0])
-                elif label[i].endswith('MISC'):
-                    tag = np.asarray([0, 0, 0, 0, 1])
-
+                try:
+                    if label[i].endswith('O'):
+                        tag = np.asarray([1, 0, 0, 0, 0])
+                    elif label[i].endswith('PER'):
+                        tag = np.asarray([0, 1, 0, 0, 0])
+                    elif label[i].endswith('LOC'):
+                        tag = np.asarray([0, 0, 1, 0, 0])
+                    elif label[i].endswith('ORG'):
+                        tag = np.asarray([0, 0, 0, 1, 0])
+                    elif label[i].endswith('MISC'):
+                        tag = np.asarray([0, 0, 0, 0, 1])
+                except Exception as e:
+                    print(e)
 
                 features.append(np.reshape(feature, (1, -1)))
                 tags.append(tag)
 
         return np.reshape(features, (len(features), -1)), np.reshape(tags, (len(tags), -1))
 
-TRAIN_PATH = './data/eng.train'
-VALIDATION_PATH = './data/eng.testa'
-TEST_PATH = './data/eng.testb'
-DICT_PATH = './tmp/myvectors.txt'
+    def next_batch(self, batch_size, shuffle=True):
+        batch_x, batch_y = super().next_batch(batch_size, shuffle = False)
+        batch_x, batch_y = self.sent2features(batch_x, batch_y)
 
-sentences, labels = extract_sentences_labels(TRAIN_PATH)
+        return batch_x, batch_y
 
-dataset = DataSet(tokens=sentences, labels=labels)
-window_nn = Word_Window_DataSet(tokens=sentences, labels=labels, dictionary_path=DICT_PATH)
 
-batch_x, batch_y = window_nn.next_batch(10,True)
-print(batch_x)
-print(batch_y)
+class CRFdataset(DataSet):
+    def __init__(self,
+                 tokens,
+                 labels,
+                 ):
+        self._tokens = self.sent2features(tokens)
+        self._labels = labels
 
-batch_x, batch_y = window_nn.next_batch(10,True)
-print(batch_x)
-print(batch_y)
+        return
 
-train_x, train_y = window_nn.sent2features(batch_x, batch_y)
+    @staticmethod
+    def word2features(sent, i):
+        word = sent[i][0]
+        pos_tag = sent[i][1]
+        chunk_tag = sent[i][2]
 
-print('end')
+        features = [
+            'bias',
+            'word.lower=' + word.lower(),
+            'word[-3:]=' + word[-3:],
+            'word[-2:]=' + word[-2:],
+            'word.isupper=%s' % word.isupper(),
+            'word.istitle=%s' % word.istitle(),
+            'word.isdigit=%s' % word.isdigit(),
+            'postag=' + pos_tag,
+            'chunktag=' + chunk_tag,
+            'postag[:2]=' + pos_tag[:2],
+        ]
+
+        if i > 0:
+            word1 = sent[i - 1][0]
+            postag1 = sent[i - 1][1]
+            chunktag1 = sent[i - 1][2]
+            features.extend([
+                '-1:word.lower=' + word1.lower(),
+                '-1:word.istitle=%s' % word1.istitle(),
+                '-1:word.isupper=%s' % word1.isupper(),
+                '-1:postag=' + postag1,
+                '-1:chunktag=' + chunktag1,
+                '-1:postag[:2]=' + postag1[:2],
+            ])
+        else:
+            features.append('BOS')
+
+        if i < len(sent) - 1:
+            word1 = sent[i + 1][0]
+            postag1 = sent[i + 1][1]
+            chunktag1 = sent[i + 1][2]
+            features.extend([
+                '+1:word.lower=' + word1.lower(),
+                '+1:word.istitle=%s' % word1.istitle(),
+                '+1:word.isupper=%s' % word1.isupper(),
+                '+1:postag=' + postag1,
+                '+1:chunktag=' + chunktag1,
+                '+1:postag[:2]=' + postag1[:2],
+            ])
+        else:
+            features.append('EOS')
+
+        return features
+
+    def sent2features(self, batch_x):
+
+        return [[self.word2features(batch_x[j], i) for i in range(len(batch_x[j]))] for j in range(len(batch_x))]
+
+    def sent2label(self, batch_y):
+        return [[label for _, _, _, label in batch_y[i]] for i in range(len(batch_y))]
+
+
+def read_data_set(model_name):
+    TRAIN_PATH = './data/eng.train'
+    VALIDATION_PATH = './data/eng.testa'
+    TEST_PATH = './data/eng.testb'
+    DICT_PATH = './tmp/myvectors.txt'
+
+    if model_name == 'crf':
+        sentences_fea, labels = extract_sentences_labels(TRAIN_PATH, feature=True)
+        return CRFdataset(tokens=sentences_fea, labels=labels)
+    elif model_name == 'w2v':
+        sentences, labels = extract_sentences_labels(TRAIN_PATH)
+        return Word_Window_DataSet(tokens=sentences, labels=labels, window_size=7, dictionary_path=DICT_PATH)
+    else:
+        sentences, labels = extract_sentences_labels(TRAIN_PATH)
+        return DataSet(tokens=sentences, labels=labels)
+
+
+def read_test_data_set(model_name):
+    TEST_PATH = './data/eng.testb'
+    DICT_PATH = './tmp/myvectors.txt'
+    if model_name == 'crf':
+        sentences_fea, labels = extract_sentences_labels(TEST_PATH, feature=True)
+        return CRFdataset(tokens=sentences_fea, labels=labels)
+    elif model_name == 'w2v':
+        sentences, labels = extract_sentences_labels(TEST_PATH)
+        return Word_Window_DataSet(tokens=sentences, labels=labels, window_size=7, dictionary_path=DICT_PATH)
+    else:
+        sentences, labels = extract_sentences_labels(TEST_PATH)
+        return DataSet(tokens=sentences, labels=labels)
+
+
+if __name__ == "__main__":
+    conll = read_data_set('w2v')
+    while True:
+        batch_x, batch_y = conll.next_batch(500)
+        print(batch_x.shape, batch_y.shape)

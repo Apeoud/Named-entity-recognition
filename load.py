@@ -84,33 +84,33 @@ def get_input(sentences):
                 else:
                     feature.append(get_vec('space'))
 
-            # if sentence[i][3].endswith('O'):
-            #     tag = np.asarray([1, 0, 0, 0, 0])
-            # elif sentence[i][3].endswith('PER'):
-            #     tag = np.asarray([0, 1, 0, 0, 0])
-            # elif sentence[i][3].endswith('LOC'):
-            #     tag = np.asarray([0, 0, 1, 0, 0])
-            # elif sentence[i][3].endswith('ORG'):
-            #     tag = np.asarray([0, 0, 0, 1, 0])
-            # elif sentence[i][3].endswith('MISC'):
-            #     tag = np.asarray([0, 0, 0, 0, 1])
+            if sentence[i][3].endswith('O'):
+                tag = np.asarray([1, 0, 0, 0, 0])
+            elif sentence[i][3].endswith('PER'):
+                tag = np.asarray([0, 1, 0, 0, 0])
+            elif sentence[i][3].endswith('LOC'):
+                tag = np.asarray([0, 0, 1, 0, 0])
+            elif sentence[i][3].endswith('ORG'):
+                tag = np.asarray([0, 0, 0, 1, 0])
+            elif sentence[i][3].endswith('MISC'):
+                tag = np.asarray([0, 0, 0, 0, 1])
 
-            if sentence[i][3] == 'O':
-                tag = np.asarray([1, 0, 0, 0, 0, 0, 0, 0])
-            elif sentence[i][3] == 'I-PER':
-                tag = np.asarray([0, 1, 0, 0, 0, 0, 0, 0])
-            elif sentence[i][3] == 'B-LOC':
-                tag = np.asarray([0, 0, 1, 0, 0, 0, 0, 0])
-            elif sentence[i][3] == 'I-LOC':
-                tag = np.asarray([0, 0, 0, 1, 0, 0, 0, 0])
-            elif sentence[i][3] == 'B-ORG':
-                tag = np.asarray([0, 0, 0, 0, 1, 0, 0, 0])
-            elif sentence[i][3] == 'I-ORG':
-                tag = np.asarray([0, 0, 0, 0, 0, 1, 0, 0])
-            elif sentence[i][3] == 'B-MISC':
-                tag = np.asarray([0, 0, 0, 0, 0, 0, 1, 0])
-            elif sentence[i][3] == 'I-MISC':
-                tag = np.asarray([0, 0, 0, 0, 0, 0, 0, 1])
+            # if sentence[i][3] == 'O':
+            #     tag = np.asarray([1, 0, 0, 0, 0, 0, 0, 0])
+            # elif sentence[i][3] == 'I-PER':
+            #     tag = np.asarray([0, 1, 0, 0, 0, 0, 0, 0])
+            # elif sentence[i][3] == 'B-LOC':
+            #     tag = np.asarray([0, 0, 1, 0, 0, 0, 0, 0])
+            # elif sentence[i][3] == 'I-LOC':
+            #     tag = np.asarray([0, 0, 0, 1, 0, 0, 0, 0])
+            # elif sentence[i][3] == 'B-ORG':
+            #     tag = np.asarray([0, 0, 0, 0, 1, 0, 0, 0])
+            # elif sentence[i][3] == 'I-ORG':
+            #     tag = np.asarray([0, 0, 0, 0, 0, 1, 0, 0])
+            # elif sentence[i][3] == 'B-MISC':
+            #     tag = np.asarray([0, 0, 0, 0, 0, 0, 1, 0])
+            # elif sentence[i][3] == 'I-MISC':
+            #     tag = np.asarray([0, 0, 0, 0, 0, 0, 0, 1])
 
             features.append(np.reshape(feature, (1, -1)))
             tags.append(tag)
@@ -129,7 +129,7 @@ def next_batch(datasets, batch_size, sentence_size):
 
 
 word_set = dict()
-with open('myvectors.txt', 'r') as rFile:
+with open('./tmp/myvectors.txt', 'r') as rFile:
     for line in rFile.readlines():
         arr = line.strip().split()
         word = arr[0]
@@ -165,8 +165,8 @@ def mlp(x, weights, biases):
 
 
 def precision_score(y_pred, y_true):
-    tp = [0] * 8
-    p = [0] * 8
+    tp = [0] * 5
+    p = [0] * 5
     for i in range(len(y_pred)):
         if y_true[i] == y_pred[i]:
             tp[y_pred[i]] += 1
@@ -179,8 +179,8 @@ def precision_score(y_pred, y_true):
 
 
 def recall_score(y_pred, y_true):
-    tp = [0] * 8
-    t = [0] * 8
+    tp = [0] * 5
+    t = [0] * 5
     for i in range(len(y_pred)):
         if y_pred[i] == y_true[i]:
             tp[y_pred[i]] += 1
