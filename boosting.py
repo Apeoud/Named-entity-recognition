@@ -3,6 +3,7 @@ import math
 from BaseEstimator import BaseEstimator, MultiLayerPerceptron
 from crf import CRF
 from conllner import read_data_set, read_test_data_set
+from load import precision_score, recall_score
 
 
 class AdaBoosting(object):
@@ -36,33 +37,43 @@ class AdaBoosting(object):
         if not isinstance(estimator, BaseEstimator):
             raise ValueError("not estimator")
 
-        y_pred = estimator.predict(batch_x) # ont-hot (n_examples, n_classes)
+        y_pred = estimator.predict(batch_x) # ont-hot (n_examples, )
 
-        y_pred_scalar = np.argmax(y_pred, axis=1)
+        # y_pred_scalar = np.argmax(y_pred, axis=1)
 
-        y_true = crf.processor(batch_y)
-        y_true_scalar = np.argmax(y_true, axis=1)
-        weights = (1.0 / len(y_true)) * np.ones(len(y_true))
 
-        return np.mean(weights * np.equal(y_pred_scalar, y_true_scalar))
+        y_true_scalar = np.argmax(batch_y, axis=1)
+        weights = (1.0 / len(y_true_scalar)) * np.ones(len(y_true_scalar))
 
-    def _ensemble(self, estimators, trains):
+        return np.mean(weights * np.equal(y_pred, y_true_scalar))
 
-        if len(estimators) != len(trains):
+    def _ensemble(self, estimators, X, y, weights):
+
+        if len(estimators) != len(X):
             raise ValueError('do not match')
+
+        pred = np.zeros((len(X[1]), 5))
 
         for i in range(len(estimators)):
             est = estimators[i]
-            train = trains[i]
+            train = X[i]
 
-            est.predict(train)
+            y_pred = est.proba(train)
+            pred += weights[i] * y_pred
+
+            # print(precision_score(y_pred, y[i]))
+
+        precision = precision_score(np.argmax(pred, 1), np.argmax(y[0], 1))
+        recall = recall_score(np.argmax(pred, 1), np.argmax(y[0], 1))
+        print(2 * precision * recall / (precision + recall))
+
 
         return
 
 
 if __name__ == "__main__":
-    train_crf = read_data_set('crf')
-    train_w2v = read_data_set('w2v')
+    train_crf = read_test_data_set('crf')
+    train_w2v = read_test_data_set('w2v')
     ada_boosting = AdaBoosting()
 
     crf = CRF(model_dir='./tmp/models/conll2003-eng.crfsuite')
@@ -75,9 +86,27 @@ if __name__ == "__main__":
         learning_rate=0.005,
         model_dir='./tmp/models/tf_mlp.ckpt'
     )
-    crf.load()
 
-    print(ada_boosting._err_rate(train_crf.tokens, train_crf.labels, crf, []))
-    train_x, train_y = train_w2v.sent2features(train_w2v.tokens[:8080], train_w2v.labels[:8080])
-    print(ada_boosting._err_rate(train_x, train_y, mlp, []))
+    est = []
+    est_x = []
+    est_y = []
 
+
+    train_x = train_crf.sent2features(train_crf.data)
+    train_y = train_crf.sent2label(train_crf.data)
+    train_y = crf.processor(train_y)
+
+    est.append(crf)
+    est_x.append(train_x)
+    est_y.append(train_y)
+
+    # print(ada_boosting._err_rate(train_x, train_y, crf, []))
+    train_x = train_w2v._extract_feature(train_w2v.data)
+    train_y = train_w2v._extract_label(train_w2v.data)
+
+    est.append(mlp)
+    est_x.append(train_x)
+    est_y.append(train_y)
+
+    # print(ada_boosting._err_rate(train_x, train_y, mlp, []))
+    ada_boosting._ensemble(est, est_x, est_y, weights=[0.70, 0.3])

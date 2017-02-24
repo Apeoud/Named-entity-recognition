@@ -258,6 +258,16 @@ class MultiLayerPerceptron(BaseEstimator):
         return
 
     def predict(self, X):
+        """ predict the label one_hot = False
+            0 : 'O'
+            1 : 'PER'
+            2 : 'LOC'
+            3 : 'ORG'
+            4 : 'MISC'
+        """
+        return np.argmax(self.proba(X), 1)
+
+    def proba(self, X):
         """ predict the unlabeled data
         Arg:
             X : to be predicted , (n_examples, n_features)
@@ -266,16 +276,10 @@ class MultiLayerPerceptron(BaseEstimator):
             y_pred : predicted label, one hot (n_examples, n_classes)
         """
 
-        if isinstance(X, DataSet):
-            while X.epochs_completed == 0:
-
-
         sess = tf.Session(graph=self.graph)
 
-
         self._saver.restore(sess, self.model_dir)
-        y_pred = sess.run(self.prediction, feed_dict={self.x : X})
-
+        y_pred = sess.run(self.prediction, feed_dict={self.x: X})
 
         return y_pred
 
@@ -285,7 +289,7 @@ if __name__ == "__main__":
 
     mlp = MultiLayerPerceptron(
         hidden_units=[300, 300],
-        train_epochs=5,
+        train_epochs=10,
         n_input=2100,
         n_classes=5,
         batch_size=100,
@@ -293,10 +297,11 @@ if __name__ == "__main__":
         model_dir='./tmp/models/tf_mlp.ckpt'
     )
 
-    conll_test = conllner.read_test_data_set('w2v')
-    test_x, test_y = conll_test.sent2features(conll_test.tokens, conll_test.labels)
+    test = conllner.read_test_data_set('w2v')
+    test_x = test._extract_feature(test._data)
+    test_y = test._extract_label(test._data)
 
-    # mlp.fit(train, [], display_step=50)
+    mlp.fit(train, [], display_step=50)
 
     # test_x, test_y = get_input(get_sentences('./data/eng.testb'))
     mlp.evaluate(test_x, test_y)

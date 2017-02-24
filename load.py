@@ -173,6 +173,7 @@ def precision_score(y_pred, y_true):
         p[y_pred[i]] += 1
     print('token numbers: ', p)
     print('total precision: ', np.sum(tp[1:] / np.sum(p[1:])))
+    return np.sum(tp[1:] / np.sum(p[1:]))
     if p[1] > 0:
         return [tp[i] / p[i] for i in range(len(tp))]
     return 0
@@ -187,6 +188,7 @@ def recall_score(y_pred, y_true):
         t[y_true[i]] += 1
     print('token numbers: ', t)
     print('total recall: ', np.sum(tp[1:] / np.sum(t[1:])))
+    return np.sum(tp[1:] / np.sum(t[1:]))
     if t[1] > 0:
         return [tp[i] / t[i] for i in range(len(tp))]
     return 0

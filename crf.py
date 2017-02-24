@@ -250,9 +250,33 @@ class CRF(BaseEstimator):
         """
         y_pred_sent = self.predict_sent(X)
 
+        return np.argmax(processor(y_pred_sent), axis=1)
 
+    def proba(self, X):
+        """ probability distribution  (n_examples, n_classes)
 
-        return processor(y_pred_sent)
+        """
+        # load the crf model
+        tagger = pycrfsuite.Tagger()
+        tagger.open(self._model_dir)
+
+        n_sentences = len(X)
+
+        full_probability = []
+        for i in range(n_sentences):
+            tagger.set(X[i])
+            for j in range(len(X[i])):
+                # full_probability.append([tagger.marginal(tagger.labels()[k], j) for k in range(len(tagger.labels()))])
+                full_probability.append(
+                    [tagger.marginal('O', j), tagger.marginal('I-PER', j),
+                     tagger.marginal('I-LOC', j) + tagger.marginal('B-LOC', j),
+                     tagger.marginal('I-ORG', j) + tagger.marginal('B-ORG', j),
+                     tagger.marginal('I-MISC', j) + tagger.marginal('B-MISC', j)])
+
+        # transform format
+        full_probability = np.reshape(full_probability, (len(full_probability), -1))
+
+        return full_probability
 
     def evaluate(self, X, y):
         """ measure of the model including precision, recall and f1-score
@@ -272,10 +296,12 @@ if __name__ == "__main__":
     crf = CRF(model_dir='./tmp/models/conll2003-eng.crfsuite')
     conll_2003_train = conllner.read_data_set('crf')
     conll_2003_test = conllner.read_test_data_set('crf')
-    crf.fit(conll_2003_train.tokens, conll_2003_train.labels)
 
-    crf.evaluate(conll_2003_test.tokens, conll_2003_test.labels)
-    y_pred = crf.predict(conll_2003_test.tokens)
+    # crf.fit(conll_2003_train.sent2features(conll_2003_train.data), conll_2003_train.sent2label(conll_2003_train.data))
+    # crf.evaluate(conll_2003_test.sent2features(conll_2003_test.data), conll_2003_test.sent2label(conll_2003_test.data))
+
+    y_pred = crf.proba(conll_2003_test.sent2features(conll_2003_test.data))
+
     print("end")
     # train_x = [sent2features(s) for s in train_sentences]
     # train_y = [sent2labels(s) for s in train_sentences]
