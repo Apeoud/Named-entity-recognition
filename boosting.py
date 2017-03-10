@@ -65,7 +65,7 @@ class AdaBoosting(object):
 
         precision = precision_score(np.argmax(pred, 1), np.argmax(y[0], 1))
         recall = recall_score(np.argmax(pred, 1), np.argmax(y[0], 1))
-        print(2 * precision * recall / (precision + recall))
+        print('recall : ', 2 * precision * recall / (precision + recall))
 
 
         return
